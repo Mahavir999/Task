@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d
+      - ./wordpress:/var/www/wordpress
+    ports:
+      - "80:80"
+    depends_on:
+      - php-fpm
+  php-fpm:
+    image: php:latest
+    container_name: php-fpm-container
+    volumes:
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./wordpress:/var/www/wordpress
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress-container
+    volumes:
+      - ./wordpress:/var/www/wordpress
+    ports:
+      - "8000:80"
+    depends_on:
+      - mysql
+
+volumes:
+  db:
+  wordpress:
